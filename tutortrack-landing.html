@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TutorTrack — إدارة الدروس الخصوصية بذكاء</title>
+<meta name="description" content="TutorTrack يسجّل حصص المعلم، يحسب المستحقات تلقائيًا، ويمنح ولي الأمر شفافية كاملة على الدفعات. جرّبه مجانًا 3 أيام.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800;900&family=Tajawal:wght@400;500;700;900&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0E1721;
+    --bg-deep: #0A1119;
+    --surface: #16212E;
+    --surface-alt: #1B2836;
+    --border: #2A3847;
+    --gold: #C9A227;
+    --gold-soft: #E3C567;
+    --teal: #2BAE9E;
+    --teal-soft: #6FD4C6;
+    --coral: #E2665B;
+    --coral-soft: #F2958D;
+    --text: #F4F1E8;
+    --muted: #93A0AC;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html{ scroll-behavior:smooth; }
+  body{
+    font-family:'Tajawal', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow-x:hidden;
+  }
+  img{ max-width:100%; }
+  a{ color:inherit; text-decoration:none; }
+  .wrap{ max-width:1180px; margin:0 auto; padding:0 28px; }
+
+  /* ===== خلفية زخرفية عامة ===== */
+  .glow-top{
+    position:absolute; top:-200px; left:50%; transform:translateX(-50%);
+    width:900px; height:900px; border-radius:50%;
+    background: radial-gradient(circle, rgba(43,174,158,0.14), transparent 65%);
+    pointer-events:none;
+  }
+  .grid-bg{
+    position:absolute; inset:0;
+    background-image: radial-gradient(rgba(255,255,255,0.03) 1.4px, transparent 1.4px);
+    background-size: 30px 30px;
+    -webkit-mask-image: linear-gradient(180deg, transparent, black 15%, black 85%, transparent);
+            mask-image: linear-gradient(180deg, transparent, black 15%, black 85%, transparent);
+  }
+
+  /* ===== هيدر ===== */
+  header{
+    position:sticky; top:0; z-index:50;
+    background: rgba(10,17,25,0.85);
+    backdrop-filter: blur(10px);
+    border-bottom:1px solid var(--border);
+  }
+  .nav{ display:flex; align-items:center; justify-content:space-between; padding:16px 0; }
+  .brand{ display:flex; align-items:center; gap:10px; }
+  .brand-mark{
+    width:36px; height:36px; border-radius:10px;
+    background: linear-gradient(155deg, #1B2836, #0E1721 60%);
+    border:1px solid rgba(201,162,39,0.4);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .brand-name{ font-family:'Cairo', sans-serif; font-weight:900; font-size:18px; }
+  .nav-cta{
+    background: var(--gold); color:#0E1721; font-family:'Cairo', sans-serif;
+    font-weight:800; font-size:13.5px; padding:10px 22px; border-radius:10px;
+  }
+
+  /* ===== القسم الرئيسي (Hero) ===== */
+  .hero{ position:relative; padding:90px 0 60px 0; overflow:hidden; }
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:'Poppins', sans-serif; font-size:12px; letter-spacing:2px;
+    color: var(--gold-soft); border:1px solid rgba(201,162,39,0.4);
+    background: rgba(201,162,39,0.08); padding:8px 16px; border-radius:999px;
+    margin-bottom:28px;
+  }
+  .hero-grid{ display:grid; grid-template-columns: 1.1fr 0.9fr; gap:60px; align-items:center; }
+  .hero h1{
+    font-family:'Cairo', sans-serif; font-weight:900; font-size:52px; line-height:1.28;
+    margin-bottom:22px;
+  }
+  .hero h1 .hl{ color: var(--gold-soft); }
+  .hero h1 .hl2{ color: var(--teal-soft); }
+  .hero p{ font-size:18px; line-height:1.85; color:var(--muted); max-width:520px; margin-bottom:34px; }
+  .hero-ctas{ display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+  .btn-primary{
+    display:inline-flex; align-items:center; gap:10px;
+    background: var(--gold); color:#0E1721; font-family:'Cairo', sans-serif;
+    font-weight:800; font-size:16px; padding:16px 30px; border-radius:12px;
+    box-shadow: 0 18px 40px rgba(201,162,39,0.28);
+  }
+  .btn-ghost{
+    font-family:'Cairo', sans-serif; font-weight:700; font-size:14.5px; color:var(--muted);
+    border-bottom:1.5px solid var(--border); padding-bottom:3px;
+  }
+  .trust-row{ margin-top:34px; display:flex; align-items:center; gap:22px; color:var(--muted); font-size:12.5px; }
+  .trust-row b{ color:var(--text); }
+
+  /* بطاقة الهيرو (بطاقة الحصة الحقيقية) */
+  .hero-visual{ position:relative; }
+  .receipt{
+    background: linear-gradient(165deg, var(--surface-alt), var(--surface));
+    border:1px solid var(--border); border-radius:24px; padding:28px;
+    box-shadow: 0 40px 90px rgba(0,0,0,0.5); transform: rotate(-3deg);
+    max-width:360px; margin-inline-start:auto;
+  }
+  .receipt-top{ display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+  .receipt-badge{
+    font-size:11.5px; font-weight:700; color:var(--teal-soft);
+    background: rgba(43,174,158,0.14); border:1px solid rgba(43,174,158,0.4);
+    padding:6px 14px; border-radius:999px;
+  }
+  .receipt-check{
+    width:28px; height:28px; border-radius:50%; background:var(--teal);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .receipt-row{ display:flex; justify-content:space-between; padding:11px 0; border-bottom:1px dashed rgba(255,255,255,0.08); font-size:14px; }
+  .receipt-row:last-of-type{ border-bottom:none; }
+  .receipt-row span:first-child{ color:var(--muted); }
+  .receipt-row span:last-child{ font-weight:700; }
+  .receipt-total{
+    margin-top:16px; background: rgba(201,162,39,0.1); border:1px dashed rgba(201,162,39,0.45);
+    border-radius:14px; padding:14px 18px; display:flex; justify-content:space-between; align-items:center;
+  }
+  .receipt-total span:first-child{ color:var(--gold-soft); font-weight:700; font-size:13px; }
+  .receipt-total span:last-child{ color:var(--gold-soft); font-size:22px; font-weight:800; }
+  .float-chip{
+    position:absolute; background:var(--surface-alt); border:1px solid var(--border);
+    border-radius:14px; padding:12px 16px; box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+    font-size:12px;
+  }
+  .float-chip.f1{ top:-10px; left:-20px; }
+  .float-chip .fc-icon{ font-size:18px; }
+  .float-chip .fc-val{ color:var(--teal-soft); font-weight:800; font-size:14px; margin-top:2px; }
+
+  /* ===== قسم المشكلة/الحل ===== */
+  .section{ position:relative; padding:80px 0; }
+  .section-head{ text-align:center; max-width:640px; margin:0 auto 50px auto; }
+  .section-eyebrow{ font-family:'Poppins', sans-serif; font-size:11.5px; letter-spacing:2.5px; color:var(--teal-soft); margin-bottom:14px; }
+  .section-head h2{ font-family:'Cairo', sans-serif; font-weight:900; font-size:34px; line-height:1.4; }
+  .section-head h2 span{ color:var(--gold-soft); }
+  .section-head p{ color:var(--muted); font-size:15.5px; line-height:1.8; margin-top:14px; }
+
+  .pain-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap:18px; }
+  .pain-card{
+    background: rgba(226,102,91,0.06); border:1px solid rgba(226,102,91,0.3);
+    border-radius:18px; padding:26px;
+  }
+  .pain-card .pi{ font-size:26px; margin-bottom:14px; }
+  .pain-card p{ font-size:14.5px; line-height:1.7; color:var(--text); }
+  .pain-card p b{ color:var(--coral-soft); }
+
+  /* ===== المزايا ===== */
+  .features-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap:22px; }
+  .feature-card{
+    background: var(--surface-alt); border:1px solid var(--border); border-radius:20px; padding:30px;
+  }
+  .feature-card .fi{
+    width:52px; height:52px; border-radius:14px; display:flex; align-items:center; justify-content:center;
+    font-size:24px; margin-bottom:18px;
+  }
+  .feature-card:nth-child(1) .fi{ background:rgba(201,162,39,0.15); }
+  .feature-card:nth-child(2) .fi{ background:rgba(43,174,158,0.15); }
+  .feature-card:nth-child(3) .fi{ background:rgba(226,102,91,0.15); }
+  .feature-card:nth-child(4) .fi{ background:rgba(201,162,39,0.15); }
+  .feature-card:nth-child(5) .fi{ background:rgba(43,174,158,0.15); }
+  .feature-card:nth-child(6) .fi{ background:rgba(226,102,91,0.15); }
+  .feature-card h3{ font-family:'Cairo', sans-serif; font-size:18px; font-weight:800; margin-bottom:10px; }
+  .feature-card p{ font-size:13.5px; line-height:1.75; color:var(--muted); }
+
+  /* ===== كيف يعمل ===== */
+  .steps{ display:grid; grid-template-columns: repeat(3, 1fr); gap:0; position:relative; }
+  .step{ text-align:center; padding:0 20px; position:relative; }
+  .step-num{
+    width:56px; height:56px; border-radius:50%; background:var(--surface-alt); border:2px solid var(--gold);
+    display:flex; align-items:center; justify-content:center; margin:0 auto 20px auto;
+    font-family:'Cairo', sans-serif; font-weight:900; font-size:20px; color:var(--gold-soft);
+  }
+  .step h4{ font-family:'Cairo', sans-serif; font-size:16px; font-weight:800; margin-bottom:8px; }
+  .step p{ font-size:13px; color:var(--muted); line-height:1.7; }
+  .step-line{
+    position:absolute; top:28px; height:2px; background: repeating-linear-gradient(90deg, var(--border) 0 8px, transparent 8px 16px);
+    width:100%; z-index:-1;
+  }
+
+  /* ===== الأسعار ===== */
+  .pricing-card{
+    max-width:480px; margin:0 auto; background: linear-gradient(165deg, var(--surface-alt), var(--surface));
+    border:1.5px solid var(--gold); border-radius:24px; padding:40px; text-align:center;
+    box-shadow: 0 30px 70px rgba(201,162,39,0.12);
+  }
+  .price-badge{
+    display:inline-block; background:rgba(43,174,158,0.15); color:var(--teal-soft); border:1px solid rgba(43,174,158,0.4);
+    font-size:12px; font-weight:700; padding:6px 16px; border-radius:999px; margin-bottom:20px;
+  }
+  .price-big{ font-family:'Cairo', sans-serif; font-size:44px; font-weight:900; margin-bottom:6px; }
+  .price-big span{ font-size:16px; color:var(--muted); font-weight:600; }
+  .price-sub{ color:var(--muted); font-size:13.5px; margin-bottom:28px; }
+  .price-list{ text-align:right; margin-bottom:30px; }
+  .price-item{ display:flex; align-items:center; gap:10px; padding:9px 0; font-size:14px; }
+  .price-item .ck{ color:var(--teal); font-weight:800; }
+
+  /* ===== الدعوة النهائية ===== */
+  .final-cta{ text-align:center; padding:90px 0; }
+  .final-cta h2{ font-family:'Cairo', sans-serif; font-size:36px; font-weight:900; margin-bottom:16px; }
+  .final-cta p{ color:var(--muted); font-size:16px; margin-bottom:36px; }
+  .qr-wrap{ display:inline-flex; flex-direction:column; align-items:center; margin-top:40px; }
+  .qr-box{ width:130px; height:130px; background:#fff; border-radius:18px; padding:12px; }
+  .qr-box img{ width:100%; height:100%; }
+  .qr-cap{ margin-top:12px; font-size:12.5px; color:var(--muted); }
+
+  /* ===== فوتر ===== */
+  footer{ border-top:1px solid var(--border); padding:34px 0; }
+  .footer-row{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; }
+  .footer-row p{ color:var(--muted); font-size:12.5px; }
+
+  @media (max-width: 860px){
+    html, body{ overflow-x:hidden; width:100%; }
+    .hero-grid{ grid-template-columns:1fr; gap:40px; }
+    .hero h1{ font-size:32px; }
+    .hero-visual{ order:-1; display:flex; justify-content:center; padding-top:24px; }
+    .receipt{ margin:0; max-width:100%; width:100%; transform:rotate(-2deg); }
+    .float-chip.f1{ left:6px; right:auto; top:-14px; }
+    .pain-grid, .features-grid{ grid-template-columns:1fr; }
+    .steps{ grid-template-columns:1fr; gap:36px; }
+    .step-line{ display:none; }
+    .section-head h2{ font-size:24px; }
+    .hero-ctas{ gap:14px; }
+  }
+</style>
+</head>
+<body>
+
+<div style="position:relative;">
+  <div class="glow-top"></div>
+  <div class="grid-bg"></div>
+
+  <header>
+    <div class="wrap nav">
+      <div class="brand">
+        <div class="brand-mark">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M12 3L2 8l10 5 8-4.2V15h2V8L12 3z" fill="#E3C567"/>
+            <circle cx="19" cy="16" r="3.2" fill="#2BAE9E"/>
+          </svg>
+        </div>
+        <span class="brand-name">TutorTrack</span>
+      </div>
+      <a href="#download" class="nav-cta">حمّل التطبيق</a>
+    </div>
+  </header>
+
+  <!-- الهيرو -->
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <div class="eyebrow">TRACK EVERY LESSON</div>
+        <h1>دروس أبنائك، <span class="hl">منظّمة</span><br>و<span class="hl2">شفّافة</span> من أول حصة</h1>
+        <p>يسجّل المعلم الحصة، يوافق ولي الأمر بضغطة واحدة، والحساب يتم تلقائيًا. لا مزيد من رسائل واتساب المبعثرة أو الحسابات اليدوية.</p>
+        <div class="hero-ctas">
+          <a href="#download" class="btn-primary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 3l14 9-14 9V3z" fill="#0E1721"/></svg>
+            جرّب 3 أيام مجانًا
+          </a>
+          <a href="#how" class="btn-ghost">كيف يعمل؟</a>
+        </div>
+        <div class="trust-row">
+          <span>🇴🇲 <b>صُنع في عُمان</b></span>
+          <span>🔒 <b>بياناتك آمنة</b></span>
+          <span>⭐ <b>عربي بالكامل</b></span>
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <div class="float-chip f1">
+          <span class="fc-icon">💰</span>
+          <div class="fc-val">22.750 ر.ع</div>
+        </div>
+        <div class="receipt">
+          <div class="receipt-top">
+            <span class="receipt-badge">حصة معتمدة</span>
+            <div class="receipt-check">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M4 12l5 5L20 6" stroke="#0E1721" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+          <div class="receipt-row"><span>الطالب</span><span>أحمد</span></div>
+          <div class="receipt-row"><span>المادة</span><span>رياضيات</span></div>
+          <div class="receipt-row"><span>المدة</span><span>1.5 ساعة</span></div>
+          <div class="receipt-total"><span>المستحق</span><span>5.250 ر.ع</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- المشكلة -->
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="section-eyebrow">قبل TutorTrack</div>
+        <h2>هل هذا يبدو <span>مألوفًا</span> لك؟</h2>
+      </div>
+      <div class="pain-grid">
+        <div class="pain-card">
+          <div class="pi">💬</div>
+          <p>رسائل واتساب متناثرة: <b>"كم حصة سجّلتها هالشهر؟"</b> ... "ما أتذكر بالضبط"</p>
+        </div>
+        <div class="pain-card">
+          <div class="pi">🧮</div>
+          <p>حساب يدوي للمبلغ كل شهر، ونسيان تعديل السعر لبعض الحصص</p>
+        </div>
+        <div class="pain-card">
+          <div class="pi">❓</div>
+          <p><b>"هل دفعت لك الشهر الماضي؟"</b> — ولا أحد متأكد فعلاً</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- المزايا -->
+  <section class="section" style="background:var(--bg-deep);">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="section-eyebrow">المزايا</div>
+        <h2>كل ما تحتاجه <span>في مكان واحد</span></h2>
+        <p>من التسجيل الأول للحصة، إلى تتبّع الدفعات، إلى مساعد ذكي يجيب على أسئلتك فورًا</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="fi">📝</div>
+          <h3>تسجيل فوري</h3>
+          <p>يسجّل المعلم كل حصة خلال ثوانٍ، والمبلغ يُحتسب تلقائيًا حسب الأجر والمدة.</p>
+        </div>
+        <div class="feature-card">
+          <div class="fi">✅</div>
+          <h3>موافقة بضغطة</h3>
+          <p>يراجع ولي الأمر كل حصة ويوافق عليها مباشرة، مع سجل شهري كامل للمدفوعات.</p>
+        </div>
+        <div class="feature-card">
+          <div class="fi">🗓</div>
+          <h3>جدول أسبوعي مرئي</h3>
+          <p>تقويم واضح يعرض كل الحصص القادمة والسابقة، بلمحة واحدة.</p>
+        </div>
+        <div class="feature-card">
+          <div class="fi">📔</div>
+          <h3>ملفات الطلاب</h3>
+          <p>ملاحظات دائمة لمستوى كل طالب وتقدّمه، تبقى محفوظة عبر كل الحصص.</p>
+        </div>
+        <div class="feature-card">
+          <div class="fi">🤖</div>
+          <h3>مساعد ذكي</h3>
+          <p>اسأل عن جدول الحصص أو المستحقات، واحصل على إجابة فورية داخل التطبيق.</p>
+        </div>
+        <div class="feature-card">
+          <div class="fi">🔒</div>
+          <h3>أمان متقدّم</h3>
+          <p>حماية من محاولات الاختراق، وتشفير كامل لبياناتك المالية والشخصية.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- كيف يعمل -->
+  <section class="section" id="how">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="section-eyebrow">البداية سهلة</div>
+        <h2>ابدأ خلال <span>دقيقتين</span></h2>
+      </div>
+      <div class="steps">
+        <div class="step-line"></div>
+        <div class="step">
+          <div class="step-num">1</div>
+          <h4>أنشئ حسابك</h4>
+          <p>سجّل كولي أمر بريدك الإلكتروني، واحصل على رمز دعوة فريد.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <h4>ادعُ المعلم</h4>
+          <p>شارك الرمز مع معلّم أبنائك، وسينضم للتطبيق خلال ثوانٍ.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <h4>تابع بشفافية</h4>
+          <p>راجع كل حصة، وافق عليها، وتابع المستحقات شهريًا بدقة.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- الأسعار -->
+  <section class="section" style="background:var(--bg-deep);">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="section-eyebrow">التسعير</div>
+        <h2>خطة <span>واحدة بسيطة</span></h2>
+      </div>
+      <div class="pricing-card">
+        <div class="price-badge">🎁 3 أيام تجربة مجانية</div>
+        <div class="price-big">1.99$ <span>/ شهريًا</span></div>
+        <div class="price-sub">إلغاء في أي وقت، بدون التزام</div>
+        <div class="price-list">
+          <div class="price-item"><span class="ck">✓</span><span>عدد مدرّسين غير محدود</span></div>
+          <div class="price-item"><span class="ck">✓</span><span>المساعد الذكي بدون قيود</span></div>
+          <div class="price-item"><span class="ck">✓</span><span>تصدير تقارير PDF/Excel</span></div>
+          <div class="price-item"><span class="ck">✓</span><span>أولوية الدعم الفني</span></div>
+        </div>
+        <a href="#download" class="btn-primary" style="width:100%; justify-content:center;">ابدأ تجربتك المجانية</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- الدعوة النهائية -->
+  <section class="final-cta" id="download">
+    <div class="wrap">
+      <h2>جاهز لتنظيم دروس أبنائك؟</h2>
+      <p>حمّله الآن مجانًا، وابدأ تجربتك المجانية لمدة 3 أيام</p>
+      <a href="https://play.google.com/store/apps/details?id=com.salehlharthy.tutortrack" class="btn-primary">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 3l14 9-14 9V3z" fill="#0E1721"/></svg>
+        حمّل من Google Play
+      </a>
+      <div class="qr-wrap">
+        <div class="qr-box"><img src="data:image/png;base64,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"></div>
+        <div class="qr-cap">أو امسح الرمز بكاميرا هاتفك</div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap footer-row">
+      <p>© 2026 TutorTrack — صُنع في سلطنة عُمان 🇴🇲</p>
+      <p>com.salehlharthy.tutortrack</p>
+    </div>
+  </footer>
+</div>
+
+</body>
+</html>
